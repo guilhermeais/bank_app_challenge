@@ -2,6 +2,7 @@ import { User } from "../entities/user";
 import { GetUserByUsername } from "../usecases/user";
 import { faker } from '@faker-js/faker';
 import { mockAccount } from "./mock-account";
+import { AddAccountToUser } from "../usecases/account";
 
 export function mockUser(): User {
   return {
@@ -12,9 +13,31 @@ export function mockUser(): User {
   }
 }
 
+export class UserMockBuilder {
+  private user: User = mockUser();
+
+  withoutId(): UserMockBuilder {
+    delete this.user.id;
+    return this;
+  }
+
+  withoutPassword (): UserMockBuilder {
+    delete this.user.password;
+    return this;
+  }
+
+  withoutAccount (): UserMockBuilder {
+    delete this.user.account;
+    return this;
+  }
+
+  build(): User {
+    return this.user;
+  }
+}
 export class GetUserByUsernameSpy implements GetUserByUsername {
   username: string;
-  result: GetUserByUsername.Result = mockUser();
+  result: GetUserByUsername.Result = new UserMockBuilder().withoutPassword().build()
 
   async getByUsername(username: string): Promise<GetUserByUsername.Result> {
     this.username = username;
@@ -44,6 +67,15 @@ export class PasswordMockBuilder {
 
   build(): string {
     return this.password
+  } 
+}
+
+export class AddAccountToUserSpy implements AddAccountToUser {
+  params: AddAccountToUser.Params;
+  result: AddAccountToUser.Result = new UserMockBuilder().withoutPassword().build();
+
+  async add(params: AddAccountToUser.Params): Promise<AddAccountToUser.Result> {
+    this.params = params;
+    return this.result;
   }
-  
 }

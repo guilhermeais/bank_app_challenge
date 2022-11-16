@@ -3,7 +3,7 @@ import {
   AddUserRepositorySpy,
   GetUserByUsernameRepositorySpy,
 } from '@/data/tests/mock-user'
-import { mockUser, PasswordMockBuilder } from '@/domain/tests/mock-user'
+import { AddAccountToUserSpy, mockUser, PasswordMockBuilder } from '@/domain/tests/mock-user'
 import { faker } from '@faker-js/faker'
 import { describe, expect, test, vitest } from 'vitest'
 import { InvalidPasswordError } from '../errors/invalid-password-error'
@@ -14,11 +14,13 @@ describe('DbAddUser usecase', () => {
   function makeSut() {
     const getUserByUsernameRepositorySpy = new GetUserByUsernameRepositorySpy()
     const addUserRepositorySpy = new AddUserRepositorySpy()
+    const addAccountToUserSpy = new AddAccountToUserSpy()
     const hasherSpy = new HasherSpy()
     const sut = new DbAddUser(
       getUserByUsernameRepositorySpy,
       hasherSpy,
-      addUserRepositorySpy
+      addUserRepositorySpy,
+      addAccountToUserSpy
     )
     getUserByUsernameRepositorySpy.result = null
     return {
@@ -26,6 +28,7 @@ describe('DbAddUser usecase', () => {
       getUserByUsernameRepositorySpy,
       hasherSpy,
       addUserRepositorySpy,
+      addAccountToUserSpy
     }
   }
 
@@ -183,15 +186,50 @@ describe('DbAddUser usecase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('should return addUserRepository result', async () => {
-    const { sut, addUserRepositorySpy } = makeSut()
+ test('should call addAccountToUser with correct params', async () => {
+    const { sut, addAccountToUserSpy, addUserRepositorySpy } = makeSut()
     const passwordMock = new PasswordMockBuilder()
     const password = passwordMock.build()
-    const result = await sut.add({
+    const params = {
+      username: faker.internet.userName(),
+      password,
+    }
+    await sut.add(params)
+
+    const expectedParams = {
+      userId: addUserRepositorySpy.result.id,
+      balance: 100,
+      currency: 'BRL'
+    }
+
+    expect(addAccountToUserSpy.params).toEqual(expectedParams)
+ });
+
+ test('should return addAccountToUser result', async () => {
+    const { sut, addAccountToUserSpy } = makeSut()
+    const passwordMock = new PasswordMockBuilder()
+    const password = passwordMock.build()
+    const params = {
+      username: faker.internet.userName(),
+      password,
+    }
+    const result = await sut.add(params)
+
+    expect(result).toEqual(addAccountToUserSpy.result)
+ });
+
+ test('should throw if addAccountToUser throws', async () => {
+    const { sut, addAccountToUserSpy } = makeSut()
+    const passwordMock = new PasswordMockBuilder()
+    const password = passwordMock.build()
+    vitest.spyOn(addAccountToUserSpy, 'add').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const promise = sut.add({
       username: faker.internet.userName(),
       password,
     })
 
-    expect(result).toEqual(addUserRepositorySpy.result)
-  })
+    await expect(promise).rejects.toThrow()
+ });
 })
