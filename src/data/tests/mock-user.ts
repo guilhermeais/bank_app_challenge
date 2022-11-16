@@ -18,7 +18,7 @@ export class GetUserByUsernameRepositorySpy
   implements GetUserByUsernameRepository
 {
   username: string
-  result: GetUserByUsernameRepository.Result =  new UserMockBuilder().withoutPassword().build()
+  result: GetUserByUsernameRepository.Result =  new UserMockBuilder().build()
 
   async getByUsername(
     username: string
