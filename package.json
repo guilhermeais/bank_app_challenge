@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx cross-env NODE_ENV=test vitest",
+    "test:unit": "npm run test -- --config vitest.unit.config.ts",
+    "test:integration": "npm run test -- --config vitest.integration.config.ts",
+    "test:coverage": "npm run test -- --coverage"
   },
   "keywords": [],
   "author": "",

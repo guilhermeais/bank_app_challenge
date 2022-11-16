@@ -6,7 +6,8 @@ export interface AddAccount {
 
 export namespace AddAccount {
   export type Params = {
-    balance: number
+    username: string
+    password: string
   }
 
   export type Result = Account
