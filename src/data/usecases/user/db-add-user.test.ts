@@ -1,4 +1,8 @@
-import { AddUserRepositorySpy, GetUserByUsernameRepositorySpy } from '@/data/tests/mock-user'
+import { HasherSpy } from '@/data/tests/mock-criptograpy'
+import {
+  AddUserRepositorySpy,
+  GetUserByUsernameRepositorySpy,
+} from '@/data/tests/mock-user'
 import { mockUser, PasswordMockBuilder } from '@/domain/tests/mock-user'
 import { faker } from '@faker-js/faker'
 import { describe, expect, test, vitest } from 'vitest'
@@ -10,12 +14,18 @@ describe('DbAddUser usecase', () => {
   function makeSut() {
     const getUserByUsernameRepositorySpy = new GetUserByUsernameRepositorySpy()
     const addUserRepositorySpy = new AddUserRepositorySpy()
-    const sut = new DbAddUser(getUserByUsernameRepositorySpy, addUserRepositorySpy)
+    const hasherSpy = new HasherSpy()
+    const sut = new DbAddUser(
+      getUserByUsernameRepositorySpy,
+      hasherSpy,
+      addUserRepositorySpy
+    )
     getUserByUsernameRepositorySpy.result = null
     return {
       sut,
       getUserByUsernameRepositorySpy,
-      addUserRepositorySpy
+      hasherSpy,
+      addUserRepositorySpy,
     }
   }
 
@@ -25,7 +35,7 @@ describe('DbAddUser usecase', () => {
     const password = passwordMock.build()
     const promise = sut.add({
       username: 'ab',
-      password
+      password,
     })
 
     await expect(promise).rejects.toThrow(
@@ -40,28 +50,30 @@ describe('DbAddUser usecase', () => {
     getUserByUsernameRepositorySpy.result = mockUser()
     const promise = sut.add({
       username: getUserByUsernameRepositorySpy.result.username,
-      password
+      password,
     })
 
     await expect(promise).rejects.toThrow(
       new InvalidUsernameError('username already exists')
     )
-  });
+  })
 
   test('should throw if getUserByUsername throws', async () => {
     const { sut, getUserByUsernameRepositorySpy } = makeSut()
     const passwordMock = new PasswordMockBuilder()
     const password = passwordMock.build()
-    vitest.spyOn(getUserByUsernameRepositorySpy, 'getByUsername').mockImplementationOnce(() => {
-      throw new Error()
-    })
+    vitest
+      .spyOn(getUserByUsernameRepositorySpy, 'getByUsername')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
     const promise = sut.add({
       username: faker.internet.userName(),
-      password
+      password,
     })
 
     await expect(promise).rejects.toThrow()
-  });
+  })
 
   test('should throw if password length is minor than 8', async () => {
     const { sut } = makeSut()
@@ -69,13 +81,13 @@ describe('DbAddUser usecase', () => {
     const passwordWithInvalidLength = passwordMock.withInvalidLength().build()
     const promise = sut.add({
       username: faker.internet.userName(),
-      password: passwordWithInvalidLength
+      password: passwordWithInvalidLength,
     })
 
     await expect(promise).rejects.toThrow(
       new InvalidPasswordError('password must be at least 8 characters long')
     )
-  });
+  })
 
   test('should throw if password does not contain a number', async () => {
     const { sut } = makeSut()
@@ -83,40 +95,78 @@ describe('DbAddUser usecase', () => {
     const passwordWithoutNumber = passwordMock.withoutNumber().build()
     const promise = sut.add({
       username: faker.internet.userName(),
-      password: passwordWithoutNumber
+      password: passwordWithoutNumber,
     })
 
     await expect(promise).rejects.toThrow(
       new InvalidPasswordError('password must contain at least one number')
     )
-  });
+  })
 
   test('should throw if password does not contain a uppercase letter', async () => {
     const { sut } = makeSut()
     const passwordMock = new PasswordMockBuilder()
-    const passwordWithoutUppercaseLetter = passwordMock.withoutUpperCase().build()
+    const passwordWithoutUppercaseLetter = passwordMock
+      .withoutUpperCase()
+      .build()
     const promise = sut.add({
       username: faker.internet.userName(),
-      password: passwordWithoutUppercaseLetter
+      password: passwordWithoutUppercaseLetter,
     })
 
     await expect(promise).rejects.toThrow(
-      new InvalidPasswordError('password must contain at least one uppercase letter')
+      new InvalidPasswordError(
+        'password must contain at least one uppercase letter'
+      )
     )
+  })
+
+  test('should call hasher with correct params', async () => {
+    const { sut, hasherSpy } = makeSut()
+    const passwordMock = new PasswordMockBuilder()
+    const password = passwordMock.build()
+    await sut.add({
+      username: faker.internet.userName(),
+      password,
+    })
+
+    expect(hasherSpy.plaintext).toBe(password)
+  });
+
+  test('should throw if hasher throws', async () => {
+    const { sut, hasherSpy } = makeSut()
+    const passwordMock = new PasswordMockBuilder()
+    const password = passwordMock.build()
+    vitest
+      .spyOn(hasherSpy, 'hash')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    const promise = sut.add({
+      username: faker.internet.userName(),
+      password,
+    })
+
+    await expect(promise).rejects.toThrow()
   });
 
   test('should call addUserRepository with correct params', async () => {
-    const { sut, addUserRepositorySpy } = makeSut()
+    const { sut, addUserRepositorySpy, hasherSpy } = makeSut()
     const passwordMock = new PasswordMockBuilder()
     const password = passwordMock.build()
     const params = {
       username: faker.internet.userName(),
-      password
+      password,
     }
     await sut.add(params)
 
-    expect(addUserRepositorySpy.params).toEqual(params)
-  });
+    const expectedParams = {
+      username: params.username,
+      password: hasherSpy.digest,
+    }
+
+    expect(addUserRepositorySpy.params).toEqual(expectedParams)
+  })
 
   test('should throw if addUserRepository throws', async () => {
     const { sut, addUserRepositorySpy } = makeSut()
@@ -127,11 +177,11 @@ describe('DbAddUser usecase', () => {
     })
     const promise = sut.add({
       username: faker.internet.userName(),
-      password
+      password,
     })
 
     await expect(promise).rejects.toThrow()
-  });
+  })
 
   test('should return addUserRepository result', async () => {
     const { sut, addUserRepositorySpy } = makeSut()
@@ -139,9 +189,9 @@ describe('DbAddUser usecase', () => {
     const password = passwordMock.build()
     const result = await sut.add({
       username: faker.internet.userName(),
-      password
+      password,
     })
 
     expect(result).toEqual(addUserRepositorySpy.result)
-  });
+  })
 })
