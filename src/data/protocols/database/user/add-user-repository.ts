@@ -1,7 +1,7 @@
 import { AddUser } from "@/domain/usecases/user"
 
 export interface AddUserRepository {
-  add: (surveyData: AddUserRepository.Params) => Promise<AddUserRepository.Result>
+  add: (userData: AddUserRepository.Params) => Promise<AddUserRepository.Result>
 }
 
 export namespace AddUserRepository {
