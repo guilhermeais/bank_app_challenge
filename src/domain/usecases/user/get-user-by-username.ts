@@ -7,6 +7,6 @@ export interface GetUserByUsername {
 export namespace GetUserByUsername {
   export type Params = string
 
-  export type Result = Omit<User, 'password'>
+  export type Result = User
 }
 
