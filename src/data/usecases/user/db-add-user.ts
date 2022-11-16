@@ -1,3 +1,4 @@
+import { Hasher } from '@/data/protocols/criptography/hasher'
 import { AddUserRepository } from '@/data/protocols/database/user/add-user-repository'
 import { GetUserByUsernameRepository } from '@/data/protocols/database/user/get-user-by-username-repository'
 import { AddUser} from '@/domain/usecases/user'
@@ -5,7 +6,7 @@ import { InvalidPasswordError } from '../errors/invalid-password-error'
 import { InvalidUsernameError } from '../errors/invalid-username-error'
 
 export class DbAddUser implements AddUser {
-  constructor(private readonly getUserByUsernameRepository: GetUserByUsernameRepository, private readonly addUserRepository: AddUserRepository) {}
+  constructor(private readonly getUserByUsernameRepository: GetUserByUsernameRepository, private readonly hasher: Hasher, private readonly addUserRepository: AddUserRepository) {}
   async add(params: AddUser.Params): Promise<AddUser.Result> {
     const { username, password } = params
     if (username.length < 3) {
@@ -39,10 +40,10 @@ export class DbAddUser implements AddUser {
         'password must contain at least one uppercase letter'
       )
     }
-
+    const hashedPassword = await this.hasher.hash(password)
     return this.addUserRepository.add({
       username,
-      password
+      password: hashedPassword
     })
   }
 }
