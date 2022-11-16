@@ -1,10 +1,11 @@
 import { AddUserRepository } from '@/data/protocols/database/user/add-user-repository'
-import { AddUser, GetUserByUsername } from '@/domain/usecases/user'
+import { GetUserByUsernameRepository } from '@/data/protocols/database/user/get-user-by-username-repository'
+import { AddUser} from '@/domain/usecases/user'
 import { InvalidPasswordError } from '../errors/invalid-password-error'
 import { InvalidUsernameError } from '../errors/invalid-username-error'
 
 export class DbAddUser implements AddUser {
-  constructor(private readonly getUserByUsername: GetUserByUsername, private readonly addUserRepository: AddUserRepository) {}
+  constructor(private readonly getUserByUsernameRepository: GetUserByUsernameRepository, private readonly addUserRepository: AddUserRepository) {}
   async add(params: AddUser.Params): Promise<AddUser.Result> {
     const { username, password } = params
     if (username.length < 3) {
@@ -13,7 +14,7 @@ export class DbAddUser implements AddUser {
       )
     }
 
-    const userExists = await this.getUserByUsername.getByUsername(username)
+    const userExists = await this.getUserByUsernameRepository.getByUsername(username)
     if (userExists) {
       throw new InvalidUsernameError('username already exists')
     }
