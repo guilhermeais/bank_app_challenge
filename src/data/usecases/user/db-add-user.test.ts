@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 import { describe, expect, test, vitest } from 'vitest'
 import { InvalidPasswordError } from '../errors/invalid-password-error'
 import { InvalidUsernameError } from '../errors/invalid-username-error'
-import { DbAddUser } from './db-add-account'
+import { DbAddUser } from './db-add-user'
 
 describe('DbAddUser usecase', () => {
   function makeSut() {
