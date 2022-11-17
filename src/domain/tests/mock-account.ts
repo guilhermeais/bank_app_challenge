@@ -5,5 +5,6 @@ export function mockAccount(): Account {
   return {
     id: faker.datatype.uuid(),
     balance: faker.datatype.number({ precision: 0.01 }),
+    currency: faker.finance.currencyCode()
   }
 }
