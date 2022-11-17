@@ -1,4 +1,3 @@
-import { UpdateAccountRepository } from '@/data/protocols/database/account/update-account-repository'
 import { MakeTransactionRepository } from '@/data/protocols/database/transactions/make-transaction-repository'
 import { GetUserByIdRepository } from '@/data/protocols/database/user/get-user-by-id-repository'
 import { GetUserByUsernameRepository } from '@/data/protocols/database/user/get-user-by-username-repository'
