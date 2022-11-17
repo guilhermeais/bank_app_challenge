@@ -6,7 +6,8 @@ export interface MakeTransactionByUsername {
 
 export namespace MakeTransactionByUsername {
   export type Params = {
-    username: string
+    fromUserId: string
+    toUsername: string
     value: number
   }
 
