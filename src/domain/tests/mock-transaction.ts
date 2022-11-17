@@ -8,3 +8,4 @@ export function mockMakeTransactionByUsernameParams(): MakeTransactionByUsername
     value: faker.datatype.number()
   }
 }
+

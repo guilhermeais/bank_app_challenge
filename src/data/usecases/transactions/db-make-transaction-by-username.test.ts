@@ -1,7 +1,7 @@
+import { MakeTransactionRepositorySpy } from '@/data/tests/mock-transactions'
 import {
   GetUserByIdRepositorySpy,
   GetUserByUsernameRepositorySpy,
-  MakeTransactionRepositorySpy,
 } from '@/data/tests/mock-user'
 import { mockMakeTransactionByUsernameParams } from '@/domain/tests/mock-transaction'
 import { describe, expect, test } from 'vitest'
