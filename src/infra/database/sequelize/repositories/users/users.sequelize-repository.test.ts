@@ -27,7 +27,7 @@ describe('UsersSequelizeRepository', () => {
       accountId: account.id,
     })
 
-    return {...user.toJSON(), account}
+    return { ...user.toJSON(), account }
   }
 
   function makeSut() {
@@ -55,8 +55,8 @@ describe('UsersSequelizeRepository', () => {
     test('should add the user at the database', async () => {
       const { sut } = makeSut()
       const account = await makeAccount()
-      console.log(account);
-      
+      console.log(account)
+
       const userData = {
         ...new UserMockBuilder().withoutAccount().build(),
         accountId: account.id,
@@ -83,22 +83,36 @@ describe('UsersSequelizeRepository', () => {
 
       const user = await sut.add(userData)
       expect(user).toEqual(userData)
-    });
+    })
   })
-
 
   describe('getById()', () => {
     test('should return the user with the given id', async () => {
       const { sut } = makeSut()
-      const user  = await makeUser()
+      const user = await makeUser()
       const userFound = await sut.getById(user.id)
       expect(userFound).toEqual(user)
     })
 
-    test('should return null if the user doest not exists', async () => {
+    test('should return null if the user does not not exists', async () => {
       const { sut } = makeSut()
       const userFound = await sut.getById(faker.datatype.uuid())
       expect(userFound).toBeNull()
+    })
+  })
+
+  describe('getByUsername()', () => {
+    test('should return the user with the given username', async () => {
+      const { sut } = makeSut()
+      const user = await makeUser()
+      const userFound = await sut.getByUsername(user.username)
+      expect(userFound).toEqual(user)
+    })
+
+    test('should return null if the user does not exists', async () => {
+      const { sut } = makeSut()
+      const userFound = await sut.getByUsername(faker.internet.userName())
+      expect(userFound).toBeNull()
     });
-  });
+  })
 })
