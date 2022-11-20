@@ -1,11 +1,16 @@
 import { AddAccountToUserRepository } from '@/data/protocols/database/account/add-account-to-user-repository'
 import { GetBalanceValueByUserIdRepository } from '@/data/protocols/database/account/get-balance-value-by-user-id'
+import { UpdateAccountRepository } from '@/data/protocols/database/account/update-account-repository'
+import { Account } from '@/domain/entities/account'
 import { AddAccountToUser } from '@/domain/usecases/account'
 import AccountModel from '../../models/accounts-model'
 import UserModel from '../../models/users-model'
 
 export class AccountsSequelizeRepository
-  implements AddAccountToUserRepository, GetBalanceValueByUserIdRepository
+  implements
+    AddAccountToUserRepository,
+    GetBalanceValueByUserIdRepository,
+    UpdateAccountRepository
 {
   async addAccountToUser(
     accountData: AddAccountToUser.Params
@@ -42,15 +47,43 @@ export class AccountsSequelizeRepository
   async getBalanceByUserId(
     userId: string
   ): Promise<GetBalanceValueByUserIdRepository.Result> {
-    const result = (await UserModel.findOne({
-      where: {
-        id: userId,
-      },
-      include: [{ model: AccountModel, as: 'account', attributes: ['balance'] }],
-    }))?.toJSON() as any
+    const result = (
+      await UserModel.findOne({
+        where: {
+          id: userId,
+        },
+        include: [
+          { model: AccountModel, as: 'account', attributes: ['balance'] },
+        ],
+      })
+    )?.toJSON() as any
 
-    return result ?{
-      balance: result.account.balance
-    } : null
+    return result
+      ? {
+          balance: result.account.balance,
+        }
+      : null
+  }
+
+  async update(accountData: UpdateAccountRepository.Params): Promise<Account> {
+    await AccountModel.update(
+      {
+        balance: accountData.balance,
+        currency: accountData.currency,
+      },
+      {
+        where: {
+          id: accountData.id,
+        },
+        returning: true,
+      }
+    )
+
+    const account = await AccountModel.findOne({
+      where: {
+        id: accountData.id,
+      },
+    })
+    return (account?.toJSON() as Account) || null
   }
 }
