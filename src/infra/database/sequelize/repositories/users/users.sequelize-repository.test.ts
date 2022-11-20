@@ -19,6 +19,17 @@ describe('UsersSequelizeRepository', () => {
     return account.toJSON()
   }
 
+  async function makeUser() {
+    const account = await makeAccount()
+    const user = await UsersModel.create({
+      username: faker.internet.userName(),
+      password: faker.internet.password(),
+      accountId: account.id,
+    })
+
+    return {...user.toJSON(), account}
+  }
+
   function makeSut() {
     const sut = new UsersSequelizeRepository()
 
@@ -28,6 +39,11 @@ describe('UsersSequelizeRepository', () => {
   }
 
   beforeAll(async () => {
+    await migrate()
+  })
+
+  beforeEach(async () => {
+    await truncate()
     await migrate()
   })
 
@@ -69,4 +85,20 @@ describe('UsersSequelizeRepository', () => {
       expect(user).toEqual(userData)
     });
   })
+
+
+  describe('getById()', () => {
+    test('should return the user with the given id', async () => {
+      const { sut } = makeSut()
+      const user  = await makeUser()
+      const userFound = await sut.getById(user.id)
+      expect(userFound).toEqual(user)
+    })
+
+    test('should return null if the user doest not exists', async () => {
+      const { sut } = makeSut()
+      const userFound = await sut.getById(faker.datatype.uuid())
+      expect(userFound).toBeNull()
+    });
+  });
 })
