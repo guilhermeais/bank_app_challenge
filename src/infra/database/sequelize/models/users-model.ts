@@ -37,7 +37,6 @@ UserModel.init(
     },
     accountId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
         model: 'accounts',
         key: 'id',

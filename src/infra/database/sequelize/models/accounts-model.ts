@@ -16,7 +16,7 @@ class AccountModel
   implements AccountAttributes
 {
   public id!: string
-  public balance: number
+  public balance!: number
   public currency!: string
 }
 AccountModel.init(

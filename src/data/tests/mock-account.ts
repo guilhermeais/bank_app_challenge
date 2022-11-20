@@ -9,7 +9,7 @@ export class AddAccountToUserRepositorySpy
   params: AddAccountToUserRepository.Params
   result = new UserMockBuilder().withoutPassword().build()
 
-  async add(
+  async addAccountToUser(
     params: AddAccountToUserRepository.Params
   ): Promise<AddAccountToUserRepository.Result> {
     this.params = params
