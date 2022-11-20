@@ -25,7 +25,7 @@ describe('DbGetBalanceValueByUserId usecase', () => {
 
   test('should throw fi getBalanceValueByUserIdRepositorySpy throws', async () => {
     const { sut, getBalanceValueByUserIdRepositorySpy } = makeSut()
-    vitest.spyOn(getBalanceValueByUserIdRepositorySpy, 'getByUserId').mockImplementationOnce(() => {
+    vitest.spyOn(getBalanceValueByUserIdRepositorySpy, getBalanceValueByUserIdRepositorySpy.getBalanceByUserId.name as any).mockImplementationOnce(() => {
       throw new Error()
     })
     const userId = faker.datatype.uuid()

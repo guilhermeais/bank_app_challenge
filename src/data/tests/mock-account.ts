@@ -25,7 +25,7 @@ export class GetBalanceValueByUserIdRepositorySpy
     balance: faker.datatype.number({ precision: 0.01 }),
   }
 
-  async getByUserId(
+  async getBalanceByUserId(
     userId: GetBalanceValueByUserIdRepository.Params
   ): Promise<GetBalanceValueByUserIdRepository.Result> {
     this.userId = userId

@@ -1,7 +1,7 @@
 import { GetBalanceValueByUserId } from "@/domain/usecases/account"
 
 export interface GetBalanceValueByUserIdRepository {
-  getByUserId: (userId: GetBalanceValueByUserIdRepository.Params) => Promise<GetBalanceValueByUserIdRepository.Result>
+  getBalanceByUserId: (userId: GetBalanceValueByUserIdRepository.Params) => Promise<GetBalanceValueByUserIdRepository.Result>
 }
 
 export namespace GetBalanceValueByUserIdRepository {

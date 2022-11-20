@@ -1,9 +1,12 @@
 import { AddAccountToUserRepository } from '@/data/protocols/database/account/add-account-to-user-repository'
+import { GetBalanceValueByUserIdRepository } from '@/data/protocols/database/account/get-balance-value-by-user-id'
 import { AddAccountToUser } from '@/domain/usecases/account'
 import AccountModel from '../../models/accounts-model'
 import UserModel from '../../models/users-model'
 
-export class AccountsSequelizeRepository implements AddAccountToUserRepository {
+export class AccountsSequelizeRepository
+  implements AddAccountToUserRepository, GetBalanceValueByUserIdRepository
+{
   async addAccountToUser(
     accountData: AddAccountToUser.Params
   ): Promise<AddAccountToUser.Result> {
@@ -14,7 +17,7 @@ export class AccountsSequelizeRepository implements AddAccountToUserRepository {
       })
     ).toJSON()
 
-    const result = await UserModel.update(
+    await UserModel.update(
       {
         accountId: account.id,
       },
@@ -34,5 +37,20 @@ export class AccountsSequelizeRepository implements AddAccountToUserRepository {
       },
     })
     return user?.toJSON() as any | null
+  }
+
+  async getBalanceByUserId(
+    userId: string
+  ): Promise<GetBalanceValueByUserIdRepository.Result> {
+    const result = (await UserModel.findOne({
+      where: {
+        id: userId,
+      },
+      include: [{ model: AccountModel, as: 'account', attributes: ['balance'] }],
+    }))?.toJSON() as any
+
+    return result ?{
+      balance: result.account.balance
+    } : null
   }
 }

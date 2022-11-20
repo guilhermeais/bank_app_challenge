@@ -8,7 +8,7 @@ export class DbGetBalanceValueByUserId implements GetBalanceValueByUserId {
   async get(
     params: GetBalanceValueByUserId.Params
   ): Promise<GetBalanceValueByUserId.Result> {
-    return await this.getBalanceValueByUserIdRepository.getByUserId(
+    return await this.getBalanceValueByUserIdRepository.getBalanceByUserId(
       params.userId
     )
   }
