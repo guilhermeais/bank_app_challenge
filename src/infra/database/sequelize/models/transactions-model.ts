@@ -58,8 +58,8 @@ TransactionModel.init({
   tableName: 'transactions',
 })
 
-TransactionModel.belongsTo(AccountModel, { as: 'debitedAccount', foreignKey: 'debitedAccountId' })
-TransactionModel.belongsTo(AccountModel, { as: 'creditedAccount', foreignKey: 'creditedAccountId' })
-AccountModel.hasMany(TransactionModel, { as: 'transactions', foreignKey: 'debitedAccountId' })
-AccountModel.hasMany(TransactionModel, { as: 'transactions', foreignKey: 'creditedAccountId' })
+TransactionModel.belongsTo(AccountModel, { as: 'debitedAccount', foreignKey: 'debitedAccountId', onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+ TransactionModel.belongsTo(AccountModel, { as: 'creditedAccount', foreignKey: 'creditedAccountId', onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+// AccountModel.hasMany(TransactionModel, { as: 'transactions', foreignKey: 'debitedAccountId' })
+// AccountModel.hasMany(TransactionModel, { as: 'transactions', foreignKey: 'creditedAccountId' })
 export default TransactionModel

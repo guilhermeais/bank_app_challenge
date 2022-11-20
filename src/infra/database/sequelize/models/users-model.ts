@@ -1,5 +1,6 @@
-import { DataTypes, Model, Optional } from 'sequelize'
+import { DataTypes, ForeignKey, HasOne, Model, Optional } from 'sequelize'
 import { sequelizeConnection } from '../helpers/connection'
+import AccountModel from './accounts-model'
 interface UserAttributes {
   id: string
   username: string
@@ -17,9 +18,11 @@ class UserModel
   public id!: string
   public username: string
   public password: string
-  public accountId!: string
+  public accountId!: ForeignKey<AccountModel['id']>
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
+
+  public account: HasOne<AccountModel>
 }
 UserModel.init(
   {
@@ -48,7 +51,8 @@ UserModel.init(
   {
     sequelize: sequelizeConnection,
     modelName: 'User',
-    tableName: 'transactions',
+    tableName: 'users',
   }
 )
+
 export default UserModel

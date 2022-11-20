@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional } from 'sequelize'
+import { BelongsTo, DataTypes, Model, Optional } from 'sequelize'
 import { sequelizeConnection } from '../helpers/connection'
 import UserModel from './users-model'
 
@@ -19,7 +19,7 @@ class AccountModel
   public balance: number
   public currency!: string
 }
- AccountModel.init(
+AccountModel.init(
   {
     balance: {
       type: DataTypes.DECIMAL(10, 2),
@@ -41,9 +41,9 @@ class AccountModel
     tableName: 'accounts',
   }
 )
-AccountModel.belongsTo(UserModel, { as: 'user', foreignKey: 'userId' })
-UserModel.hasOne(AccountModel, { as: 'account', foreignKey: 'userId' })
 
+UserModel.belongsTo(AccountModel, {
+  foreignKey: 'accountId',
+  as: 'account',
+})
 export default AccountModel
-
-
