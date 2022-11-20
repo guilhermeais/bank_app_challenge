@@ -6,6 +6,7 @@ import UsersModel from '../../models/users-model'
 import { UserMockBuilder } from '@/domain/tests/mock-user'
 import { faker } from '@faker-js/faker'
 import AccountModel from '../../models/accounts-model'
+import MockDate from 'mockdate'
 
 describe('UsersSequelizeRepository', () => {
   async function makeAccount() {
@@ -39,6 +40,7 @@ describe('UsersSequelizeRepository', () => {
   }
 
   beforeAll(async () => {
+    MockDate.set(new Date())
     await migrate()
   })
 
@@ -49,6 +51,7 @@ describe('UsersSequelizeRepository', () => {
 
   afterAll(async () => {
     await truncate()
+    MockDate.reset()
   })
 
   describe('add()', () => {
