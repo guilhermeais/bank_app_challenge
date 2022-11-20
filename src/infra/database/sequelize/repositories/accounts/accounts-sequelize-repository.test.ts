@@ -20,10 +20,23 @@ describe('AccountsSequelizeRepository', () => {
     await truncate()
   })
 
-  async function makeUser() {
+  async function makeAccount() {
+    const account = await AccountModel.create({
+      balance: faker.datatype.number({
+        precision: 0.01,
+      }),
+      currency: faker.finance.currencyCode(),
+    })
+
+    return account.toJSON()
+  }
+
+
+  async function makeUser(accountId?:string) {
     const user = await UserModel.create({
       username: faker.internet.userName(),
       password: faker.internet.password(),
+      accountId: accountId
     })
 
     return user.toJSON()
@@ -85,4 +98,20 @@ describe('AccountsSequelizeRepository', () => {
       expect(user.id).toEqual(params.userId)
     });
   })
+
+  describe('getBalanceByUserId()', () => {
+    test('should return the balance of the user', async () => {
+      const { sut } = makeSut()
+      const account = await makeAccount()
+      const user = await makeUser(account.id)
+      const result = await sut.getBalanceByUserId(user.id)
+      expect(result.balance).toStrictEqual(account.balance)
+    })
+
+    test('should return null if users does not exists', async () => {
+      const { sut } = makeSut()
+      const result = await sut.getBalanceByUserId(faker.datatype.uuid())
+      expect(result).toBeNull()
+    });
+  });
 })
