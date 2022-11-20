@@ -36,7 +36,7 @@ describe('DbAddAccountToUser usecase', () => {
 
     test('should throw if addAccountToUserRepository throws', async () => {
       const { sut, addAccountToUserRepository } = makeSut()
-      vitest.spyOn(addAccountToUserRepository, 'add').mockRejectedValueOnce(new Error())
+      vitest.spyOn(addAccountToUserRepository, addAccountToUserRepository.addAccountToUser.name as any).mockRejectedValueOnce(new Error())
 
       const promise = sut.add({
         balance: faker.datatype.number({precision: 0.01}),

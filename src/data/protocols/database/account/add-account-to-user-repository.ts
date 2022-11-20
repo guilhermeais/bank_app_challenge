@@ -1,7 +1,7 @@
 import { AddAccountToUser } from "@/domain/usecases/account"
 
 export interface AddAccountToUserRepository {
-  add: (accountData: AddAccountToUserRepository.Params) => Promise<AddAccountToUserRepository.Result>
+  addAccountToUser: (accountData: AddAccountToUserRepository.Params) => Promise<AddAccountToUserRepository.Result>
 }
 
 export namespace AddAccountToUserRepository {

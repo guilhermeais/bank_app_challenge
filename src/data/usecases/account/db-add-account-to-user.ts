@@ -6,7 +6,7 @@ export class DbAddAccountToUser implements AddAccountToUser {
     private readonly addAccountToUserRepository: AddAccountToUserRepository,
   ) {}
   async add(params: AddAccountToUser.Params): Promise<AddAccountToUser.Result> {
-    const account = await this.addAccountToUserRepository.add(params);
+    const account = await this.addAccountToUserRepository.addAccountToUser(params);
     return account;
   }
 }
