@@ -114,4 +114,30 @@ describe('AccountsSequelizeRepository', () => {
       expect(result).toBeNull()
     });
   });
+
+  describe('update()', () => {
+    test('should update an existing account', async () => {
+      const { sut } = makeSut()
+      const account = await makeAccount()
+      const newBalance = faker.datatype.number({
+        precision: 0.01,
+      })
+      const updatedAccount = await sut.update({
+        balance: newBalance,
+        id: account.id,
+      })
+      expect(updatedAccount.balance).toEqual(newBalance)
+    });
+  })
+
+  test('should return null if account does not exists', async () => {
+    const { sut } = makeSut()
+    const result = await sut.update({
+      balance: faker.datatype.number({
+        precision: 0.01,
+      }),
+      id: faker.datatype.uuid(),
+    })
+    expect(result).toBeNull()
+  });
 })
